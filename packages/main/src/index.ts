@@ -10,21 +10,28 @@ import {allowExternalUrls} from './modules/ExternalUrls.js';
 
 
 export async function initApp(initConfig: AppInitConfig) {
-  const moduleRunner = createModuleRunner()
+  let moduleRunner = createModuleRunner()
     .init(createWindowManagerModule({initConfig, openDevTools: import.meta.env.DEV}))
     .init(disallowMultipleAppInstance())
     .init(terminateAppOnLastWindowClose())
     .init(hardwareAccelerationMode({enable: false}))
-    .init(autoUpdater())
-
     // Install DevTools extension if needed
     // .init(chromeDevToolsExtension({extension: 'VUEJS3_DEVTOOLS'}))
+    .init(autoUpdater());
 
-    // Security
-    .init(allowInternalOrigins(
-      new Set(initConfig.renderer instanceof URL ? [initConfig.renderer.origin] : []),
-    ))
-    .init(allowExternalUrls(
+  // Security
+  const allowedInternalOrigins = [];
+  if (initConfig.renderer instanceof URL) {
+    allowedInternalOrigins.push(initConfig.renderer.origin);
+  }
+  if (initConfig.popup instanceof URL) {
+    allowedInternalOrigins.push(initConfig.popup.origin);
+  }
+  moduleRunner = moduleRunner.init(allowInternalOrigins(
+    new Set(allowedInternalOrigins)
+  ));
+
+  moduleRunner.init(allowExternalUrls(
       new Set(
         initConfig.renderer instanceof URL
           ? [

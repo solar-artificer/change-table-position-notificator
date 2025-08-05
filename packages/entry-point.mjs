@@ -32,5 +32,9 @@ initApp(
     preload: {
       path: fileURLToPath(import.meta.resolve('@app/preload/exposed.mjs')),
     },
+
+    popup: {
+      path: fileURLToPath(import.meta.resolve('@app/popup')),
+    },
   },
 );

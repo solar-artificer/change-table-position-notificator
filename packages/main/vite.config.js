@@ -1,6 +1,8 @@
 import {getNodeMajorVersion} from '@app/electron-versions';
 import {spawn} from 'child_process';
 import electronPath from 'electron';
+import { copyFileSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
 
 export default /**
  * @type {import('vite').UserConfig}
@@ -22,14 +24,44 @@ export default /**
         entryFileNames: '[name].js',
       },
     },
-    emptyOutDir: true,
+    emptyOutDir: {
+      filter: (file) => !file.includes('fullscreen_display_checker.dll'),
+    },
     reportCompressedSize: false,
   },
   plugins: [
     handleHotReload(),
+    copyDllPlugin(),
   ],
 });
 
+/**
+ * Copy DLL files to dist directory
+ * @return {import('vite').Plugin}
+ */
+function copyDllPlugin() {
+  return {
+    name: 'copy-dll-plugin',
+    writeBundle() {
+      // Get the current working directory (should be the package root)
+      const packageRoot = process.cwd();
+      const dllSource = join(packageRoot, 'packages', 'main', 'src', 'fullscreen-display-checker', 'fullscreen_display_checker.dll');
+      const dllDest = join(packageRoot, 'packages', 'main', 'dist', 'fullscreen_display_checker.dll');
+      
+      console.log('Package root:', packageRoot);
+      console.log('DLL source:', dllSource);
+      console.log('DLL dest:', dllDest);
+      console.log('Source exists:', existsSync(dllSource));
+      
+      if (existsSync(dllSource)) {
+        copyFileSync(dllSource, dllDest);
+        console.log(`Copied ${dllSource} to ${dllDest}`);
+      } else {
+        console.warn(`DLL file not found at ${dllSource}`);
+      }
+    },
+  };
+}
 
 /**
  * Implement Electron app reload when some file was changed

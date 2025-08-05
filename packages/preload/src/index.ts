@@ -1,9 +1,11 @@
-import {sha256sum} from './nodeCrypto.js';
-import {versions} from './versions.js';
-import {ipcRenderer} from 'electron';
+import {ipcRenderer } from 'electron';
 
-function send(channel: string, message: string) {
-  return ipcRenderer.invoke(channel, message);
+async function spawnNotification() {
+  setTimeout(() => {
+    return ipcRenderer.invoke("spawn-notification");
+  }, 5000);
 }
 
-export {sha256sum, versions, send};
+export {
+  spawnNotification
+}

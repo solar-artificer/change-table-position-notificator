@@ -53,7 +53,8 @@ const rendererWatchServerProvider = {
 /** @type {string[]} */
 const packagesToStart = [
   'packages/preload',
-  'packages/main',
+  'packages/popup',
+  'packages/main'
 ];
 
 for (const pkg of packagesToStart) {
