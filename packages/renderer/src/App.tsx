@@ -1,37 +1,88 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 import {spawnNotification} from '@app/preload';
+import {useState, useRef} from 'react';
 
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [remainingSeconds, setRemainingSeconds] = useState( 1 * 3);
+
+  const fullMinutes = Math.floor(remainingSeconds / 60);
+  const secondsWithoutMinutes = remainingSeconds - fullMinutes * 60;
+
+  const [intervalTimer, setIntervalTimer] = useState<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  function onCountDownFinish() {
+    spawnNotification();
+  }
+
+  function startCountDown() {
+    const intervalTimer = setInterval(() => {
+      setRemainingSeconds(prevSeconds => {
+        const newSeconds = prevSeconds - 1;
+
+        if (newSeconds === 0) {
+          // Clear the interval immediately
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+          setIntervalTimer(null);
+          onCountDownFinish();
+        }
+
+        return newSeconds;
+      });
+    }, 1000);
+
+    intervalRef.current = intervalTimer;
+    setIntervalTimer(intervalTimer);
+  }
+
+  function stopCountDown() {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      setIntervalTimer(null);
+    }
+  }
+
+  function pauseCountDown() {
+    if (intervalRef.current === null) {
+      return;
+    }
+    clearInterval(intervalRef.current);
+    intervalRef.current = null;
+    setIntervalTimer(null);
+  }
+
+  function resetCountDown() {
+    stopCountDown();
+    setRemainingSeconds(1 * 10);
+  }
+
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <button onClick={() => spawnNotification()}>Spawn Notification</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <div>{String(fullMinutes).padStart(2, '0')}:{String(secondsWithoutMinutes).padStart(2, '0')}</div>
+        <div>
+          {intervalTimer === null && (
+            <button onClick={() => startCountDown()}>
+              <i className="fa-solid fa-play"></i>
+            </button>
+          )}
+          {intervalTimer !== null && (
+            <button onClick={() => pauseCountDown()}>
+              <i className="fa-solid fa-pause"></i>
+            </button>
+          )}
+          <button onClick={() => resetCountDown()}>
+            <i className="fa-solid fa-arrow-rotate-left"></i>
+          </button>
+        </div>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }

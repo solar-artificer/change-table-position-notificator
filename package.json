@@ -37,6 +37,7 @@
     "playwright": "^1.54.1"
   },
   "dependencies": {
-    "@app/main": "*"
+    "@app/main": "*",
+    "libwin32": "^0.8.1"
   }
 }
