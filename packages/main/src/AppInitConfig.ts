@@ -8,10 +8,4 @@ export type AppInitConfig = {
         path: string;
       }
     | URL;
-
-  popup:
-    | {
-    path: string;
-  }
-    | URL;
 };

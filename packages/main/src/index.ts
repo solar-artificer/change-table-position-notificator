@@ -24,9 +24,6 @@ export async function initApp(initConfig: AppInitConfig) {
   if (initConfig.renderer instanceof URL) {
     allowedInternalOrigins.push(initConfig.renderer.origin);
   }
-  if (initConfig.popup instanceof URL) {
-    allowedInternalOrigins.push(initConfig.popup.origin);
-  }
   moduleRunner = moduleRunner.init(allowInternalOrigins(
     new Set(allowedInternalOrigins)
   ));

@@ -5,6 +5,10 @@
     "build": "vite build",
     "typecheck": "tsc --noEmit"
   },
+  "files": [
+    "dist/**",
+    "package.json"
+  ],
   "exports": {
     ".": {
       "types": "./src/index.ts",

@@ -23,6 +23,17 @@ class WindowManager implements AppModule {
     globalShortcut.register('F13', () => {
       this.#mainWindow!.webContents.send('stop-notification');
     })
+    globalShortcut.register('F14', () => {
+      this.#mainWindow!.webContents.send('toggle-play-status');
+    })
+    globalShortcut.register('F15', () => {
+      if (this.#mainWindow.isVisible()) {
+        this.#mainWindow.hide();
+      } else {
+        this.#mainWindow.show();
+        this.tryPositionWindowAsVisible(this.#mainWindow!);
+      }
+    })
 
     await this.restoreOrCreateWindow(true);
 
@@ -125,12 +136,15 @@ class WindowManager implements AppModule {
         sandbox: false, // Sandbox disabled because the demo of preload script depend on the Node.js api
         webviewTag: false, // The webview tag is not recommended. Consider alternatives like an iframe or Electron's BrowserView. @see https://www.electronjs.org/docs/latest/api/webview-tag#warning
         preload: this.#preload.path,
+        backgroundThrottling: false  // Prevents throttling when hidden
+
       },
       titleBarStyle: "hidden",
       autoHideMenuBar: true,
 
       width: 295,
-      height: 480
+      height: 480,
+      resizable: false,
     });
 
     if (this.#renderer instanceof URL) {

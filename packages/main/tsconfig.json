@@ -12,8 +12,7 @@
     "baseUrl": ".",
     "paths": {
       "@app/preload": ["../preload"],
-      "@app/renderer": ["../renderer"],
-      "@app/popup": ["../popup"]
+      "@app/renderer": ["../renderer"]
     }
   },
   "include": ["src/**/*.ts", "../../types/**/*.d.ts"],
