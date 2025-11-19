@@ -18,19 +18,32 @@ function getDllPath() {
   }
 }
 
-// Load the DLL using Koffi
-const lib = koffi.load(getDllPath());
-
-// Define the function signatures
-const GetDisplaysAndFullScreenApps = lib.func('GetDisplaysAndFullScreenApps', 'str', []);
-
 export default class FullScreenDisplayChecker {
+    private lib: any = null;
+    private GetDisplaysAndFullScreenApps: any = null;
+
+    private initializeDLL() {
+        if (!this.lib) {
+            try {
+                // Load the DLL using Koffi
+                this.lib = koffi.load(getDllPath());
+                
+                // Define the function signatures
+                this.GetDisplaysAndFullScreenApps = this.lib.func('GetDisplaysAndFullScreenApps', 'str', []);
+            } catch (error) {
+                console.error('Failed to load DLL:', error);
+                throw new Error(`Failed to load fullscreen display checker DLL: ${error.message}`);
+            }
+        }
+    }
+
     /**
      * Get fullscreen windows data as JSON object
      */
     getDisplaysAndFullScreenApps() {
         try {
-            const jsonString = GetDisplaysAndFullScreenApps();
+            this.initializeDLL();
+            const jsonString = this.GetDisplaysAndFullScreenApps();
             return JSON.parse(jsonString);
         } catch (error) {
             console.error('Failed to get display and fullscreen apps data:', error);

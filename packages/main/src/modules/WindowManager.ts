@@ -11,7 +11,7 @@ class WindowManager implements AppModule {
 
   #mainWindow: BrowserWindow | null = null;
 
-  constructor({initConfig, openDevTools = false}: {initConfig: AppInitConfig, openDevTools?: boolean}) {
+  constructor({initConfig, openDevTools = true}: {initConfig: AppInitConfig, openDevTools?: boolean}) {
     this.#preload = initConfig.preload;
     this.#renderer = initConfig.renderer;
     this.#openDevTools = openDevTools;
@@ -137,14 +137,16 @@ class WindowManager implements AppModule {
         webviewTag: false, // The webview tag is not recommended. Consider alternatives like an iframe or Electron's BrowserView. @see https://www.electronjs.org/docs/latest/api/webview-tag#warning
         preload: this.#preload.path,
         backgroundThrottling: false  // Prevents throttling when hidden
-
       },
       titleBarStyle: "hidden",
       autoHideMenuBar: true,
 
       width: 295,
-      height: 480,
+      height: 600,
       resizable: false,
+
+      frame: false,
+      transparent: true
     });
 
     if (this.#renderer instanceof URL) {
@@ -178,7 +180,9 @@ class WindowManager implements AppModule {
     window?.show();
 
     if (this.#openDevTools) {
-      window?.webContents.openDevTools();
+      window?.webContents.openDevTools({
+        mode: 'detach'
+      });
     }
 
     window.focus();

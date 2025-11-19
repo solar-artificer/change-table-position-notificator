@@ -43,20 +43,13 @@ function copyDllPlugin() {
   return {
     name: 'copy-dll-plugin',
     writeBundle() {
-      // The vite build runs from the package directory (packages/main)
-      const dllSource = join(process.cwd(), 'src', 'fullscreen-display-checker', 'fullscreen_display_checker.dll');
-      const dllDest = join(process.cwd(), 'dist', 'fullscreen_display_checker.dll');
-      
-      console.log('Current working directory:', process.cwd());
-      console.log('DLL source:', dllSource);
-      console.log('DLL dest:', dllDest);
-      console.log('Source exists:', existsSync(dllSource));
+      // Use __dirname to get the correct package directory
+      const packageDir = process.cwd().includes('packages/main') ? process.cwd() : join(process.cwd(), 'packages', 'main');
+      const dllSource = join(packageDir, 'src', 'fullscreen-display-checker', 'fullscreen_display_checker.dll');
+      const dllDest = join(packageDir, 'dist', 'fullscreen_display_checker.dll');
       
       if (existsSync(dllSource)) {
         copyFileSync(dllSource, dllDest);
-        console.log(`Copied ${dllSource} to ${dllDest}`);
-      } else {
-        console.warn(`DLL file not found at ${dllSource}`);
       }
     },
   };
