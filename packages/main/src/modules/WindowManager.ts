@@ -180,9 +180,11 @@ class WindowManager implements AppModule {
     window?.show();
 
     if (this.#openDevTools) {
+      /*
       window?.webContents.openDevTools({
         mode: 'detach'
       });
+       */
     }
 
     window.focus();
