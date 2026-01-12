@@ -43,8 +43,9 @@ function copyDllPlugin() {
   return {
     name: 'copy-dll-plugin',
     writeBundle() {
-      // Use __dirname to get the correct package directory
-      const packageDir = process.cwd().includes('packages/main') ? process.cwd() : join(process.cwd(), 'packages', 'main');
+      // Get the correct package directory - when running from workspace, cwd is already in packages/main
+      const cwd = process.cwd();
+      const packageDir = cwd.endsWith('packages\\main') || cwd.endsWith('packages/main') ? cwd : join(cwd, 'packages', 'main');
       const dllSource = join(packageDir, 'src', 'fullscreen-display-checker', 'fullscreen_display_checker.dll');
       const dllDest = join(packageDir, 'dist', 'fullscreen_display_checker.dll');
       

@@ -3,6 +3,7 @@ import {ModuleContext} from '../ModuleContext.js';
 import {BrowserWindow, ipcMain, screen, Display, globalShortcut} from 'electron';
 import type {AppInitConfig} from '../AppInitConfig.js';
 import FullScreenDisplayChecker from '../fullscreen-display-checker/FullScreenDisplayChecker.js';
+import path from 'node:path';
 
 class WindowManager implements AppModule {
   readonly #preload: {path: string};
@@ -15,6 +16,7 @@ class WindowManager implements AppModule {
     this.#preload = initConfig.preload;
     this.#renderer = initConfig.renderer;
     this.#openDevTools = openDevTools;
+    console.log(process.pid);
   }
 
   async enable({app}: ModuleContext): Promise<void> {
@@ -51,7 +53,13 @@ class WindowManager implements AppModule {
     });
 
     ipcMain.handle('show-window', async () => {
+      new FullScreenDisplayChecker().showWindowByPID(process.pid)
       this.tryPositionWindowAsVisible(this.#mainWindow!);
+
+      if (this.#mainWindow!.isMinimized()) {
+        this.#mainWindow!.restore();
+      }
+      this.#mainWindow!.show();
     });
   }
 
